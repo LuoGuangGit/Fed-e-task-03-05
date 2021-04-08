@@ -63,18 +63,18 @@
        * 首先判断 `target` 中是否有自己的 `key` 属性，如果有，成功删除这个 `key` 属性后再触发更新（`trigger`），最后返回删除是否成功
    * 创建并返回 `Proxy` 对象
 2. `effect`
-  * 接收一个函数作为参数 => callback
-  * 首先执行一次 `callback()` 在函数中访问响应式对象的属性，在这个过程中去收集依赖，在收集依赖的过程中要把 `callback` 存储起来，在函数外部定义变量 `activeEffect` 保存，让之后的 `track` 函数能够访问到这里的 `callback`
+   * 接收一个函数作为参数 => callback
+   * 首先执行一次 `callback()` 在函数中访问响应式对象的属性，在这个过程中去收集依赖，在收集依赖的过程中要把 `callback` 存储起来，在函数外部定义变量 `activeEffect` 保存，让之后的 `track` 函数能够访问到这里的 `callback`
 3. `track`
-  * 接收两个参数：`target、key`，在函数外部定义 `let targetMap = new WeakMap()`
-  * 首先判断 `activeEffect`
+   * 接收两个参数：`target、key`，在函数外部定义 `let targetMap = new WeakMap()`
+   * 首先判断 `activeEffect`
     * 如果值为 `null` 说明当前没有要收集的依赖，所以直接返回
     * 否则的话在 `targetMap` 中根据当前的 `target` 来找 `depsMap`，因为当前的 `target` 就是 `targetMap` 当中的键
     * 判断是否找到了 `depsMap`，因为 `target` 可能没有收集过依赖，如果没有找到，那么要为当前的 `target` 创建一个对应的 `depsMap` 去存储对应的键 `key` 和对应的 `dep` 对象，把它添加到 `targetMap` 中，并且给 `depsMap` 赋值
     * 给 `dep` 添加 `activeEffect`
 4. `trigger`
-  * 接收两个参数：`target、key`
-  * 根据 `target` 在 `targetMap` 中找到 `depsMap`
-  * 判断是否找到 `depsMap`，如果没有找到，直接返回；如果找到了 `depsMap`：
+   * 接收两个参数：`target、key`
+   * 根据 `target` 在 `targetMap` 中找到 `depsMap`
+   * 判断是否找到 `depsMap`，如果没有找到，直接返回；如果找到了 `depsMap`：
     * 那么再根据 `key` 找到对应的 `dep` 集合（`depsMap.get(key)`）
     * 判断 `dep` 是否有值，有值则遍历 `dep` 集合，然后去执行里面的每一个 `effect` 函数
